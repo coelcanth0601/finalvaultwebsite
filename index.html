@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Final Vault — Finally! Privacy</title>
+  <meta name="description" content="Final Vault. Your files, private by default. No cloud, no recovery, no one else's key.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg: #030304;
+      --bg-raised: rgba(255, 255, 255, 0.03);
+      --glass-bg: rgba(20, 20, 25, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-shine: rgba(255, 255, 255, 0.08);
+      --ink: #F2F0EB;
+      --ink-dim: #92908A;
+      --line: rgba(255, 255, 255, 0.08);
+      --accent-saffron: #FF9933;
+      --accent-green: #138808;
+      --accent-cyan: #00f2fe;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      padding-bottom: 100px;
+    }
+
+    /* ---------- Scroll Container & Pinned Canvas ---------- */
+    .hero-scroll-container {
+      height: 300vh;
+      position: relative;
+    }
+
+    .pinned-hero {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #hero-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Overlay Elements during Scroll */
+    .hero-overlay {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .brand-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(36px, 8vw, 76px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-top: 16px;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      background: linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      margin-top: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 30px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: bounce 2s infinite;
+      z-index: 2;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* ---------- Liquid Glass Container ---------- */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 var(--glass-shine),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    /* ---------- Tab Content Sections ---------- */
+    .tab-content {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .lede {
+      max-width: 680px;
+      margin: 40px auto 60px;
+      font-family: 'Fraunces', serif;
+      font-weight: 400;
+      font-size: clamp(22px, 3.5vw, 30px);
+      line-height: 1.5;
+      text-align: center;
+      color: var(--ink);
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 28px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 60px;
+    }
+
+    .flow-item {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .flow-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--accent-cyan);
+      letter-spacing: 0.1em;
+    }
+
+    .flow-item h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .flow-item p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink-dim);
+    }
+
+    .plate {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .plate-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .plate-row:last-child { border-bottom: none; }
+    .plate-row span:first-child { color: var(--ink-dim); }
+    .plate-row span:last-child { color: var(--ink); text-align: right; }
+
+    .tricolor-text {
+      background: linear-gradient(90deg, var(--accent-saffron), var(--ink), var(--accent-green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent !important;
+      font-weight: 600;
+    }
+
+    .policy-card {
+      text-align: center;
+      padding: 60px 32px;
+      margin: 40px 0;
+    }
+
+    .policy-quote {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-size: clamp(20px, 3vw, 26px);
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 32px;
+      margin-top: 60px;
+      border-top: 1px solid var(--line);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--ink-dim);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    /* ---------- iOS Liquid Glass Bottom Navigation Bar ---------- */
+    .ios-nav-wrapper {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: calc(100% - 32px);
+      max-width: 420px;
+    }
+
+    .ios-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 36px;
+      background: rgba(18, 18, 22, 0.65);
+      backdrop-filter: blur(25px) saturate(200%);
+      -webkit-backdrop-filter: blur(25px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+      position: relative;
+    }
+
+    .nav-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      color: var(--ink-dim);
+      padding: 8px 16px;
+      border-radius: 24px;
+      cursor: pointer;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      width: 33.33%;
+      z-index: 2;
+    }
+
+    .nav-tab i {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+      transition: transform 0.3s ease;
+    }
+
+    .nav-tab.active {
+      color: #FFFFFF;
+    }
+
+    .nav-tab.active i {
+      transform: translateY(-2px);
+    }
+
+    .nav-indicator {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 8px;
+      width: calc(33.33% - 5px);
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .hero-scroll-container { height: 260vh; }
+      .site-footer { justify-content: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= SCROLL-DRIVEN ANIMATED HERO ================= -->
+  <div class="hero-scroll-container" id="hero-container">
+    <div class="pinned-hero">
+      <canvas id="hero-canvas"></canvas>
+
+      <div class="hero-overlay">
+        <h1 class="brand-title" id="brand-title">FINAL VAULT</h1>
+        <p class="brand-subtitle" id="brand-subtitle">Private • Local • Zero-Cloud</p>
+      </div>
+
+      <div class="scroll-hint" id="scroll-hint">
+        <span>SCROLL TO UNLOCK</span>
+        <i data-lucide="chevron-down" style="width:16px; height:16px;"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TAB CONTENT PAGES ================= -->
+  <main id="main-content">
+    
+    <!-- Tab 1: Overview -->
+    <section id="tab-overview" class="tab-content active">
+      <p class="lede">
+        Final Vault keeps your files on a drive you hold, opened only by a password only you know. Nothing about it phones home. Nothing about it is recoverable if you lose that password — that part's on purpose.
+      </p>
+
+      <div class="glass-card policy-card">
+        <p class="policy-quote">
+          "If you forget the password, the data is gone.<br>
+          That's not a bug we haven't fixed.<br>
+          <span style="color: var(--accent-saffron);">It's the whole point.</span>"
+        </p>
+      </div>
+    </section>
+
+    <!-- Tab 2: Architecture / Security Flow -->
+    <section id="tab-architecture" class="tab-content">
+      <h2 class="section-title">How It Stays Yours</h2>
+      <div class="flow-grid">
+        <div class="glass-card flow-item">
+          <span class="flow-num">01</span>
+          <h3>You're the Only Key</h3>
+          <p>A username and password, chosen by you, never written down anywhere — not on the drive, not on your phone.</p>
+        </div>
+
+        <div class="glass-card flow-item">
+          <span class="flow-num">02</span>
+          <h3>Locked, Properly</h3>
+          <p>Everything is scrambled before it ever touches the drive — your files, and their names too.</p>
+        </div>
+
+        <div class="glass-card flow-item">
+          <span class="flow-num">03</span>
+          <h3>No Way Back In</h3>
+          <p>Forget your password and it's gone for good. No support desk, no reset link, no exceptions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Technical Specifications -->
+    <section id="tab-specs" class="tab-content">
+      <h2 class="section-title">Specifications</h2>
+      <div class="glass-card plate">
+        <div class="plate-row"><span>ENCRYPTION</span><span>ON, ALWAYS</span></div>
+        <div class="plate-row"><span>AUTH</span><span>USERNAME + PASSWORD</span></div>
+        <div class="plate-row"><span>FILENAMES</span><span>HIDDEN TOO</span></div>
+        <div class="plate-row"><span>CLOUD BACKUP</span><span>NEVER</span></div>
+        <div class="plate-row"><span>RECOVERY</span><span>NONE</span></div>
+        <div class="plate-row"><span>LOOK</span><span class="tricolor-text">MATERIAL YOU · DARK</span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <span>FINAL VAULT</span>
+    <span style="color: var(--ink);">Built by Rachit Ranade</span>
+    <a href="https://github.com/" target="_blank" rel="noopener" style="color: var(--accent-cyan); text-decoration: none;">Source ↗</a>
+  </footer>
+
+  <!-- ================= iOS LIQUID GLASS BOTTOM NAVBAR ================= -->
+  <div class="ios-nav-wrapper">
+    <nav class="ios-nav">
+      <div class="nav-indicator" id="nav-indicator"></div>
+      
+      <button class="nav-tab active" onclick="switchTab('overview', 0)">
+        <i data-lucide="shield"></i>
+        <span>Overview</span>
+      </button>
+
+      <button class="nav-tab" onclick="switchTab('architecture', 1)">
+        <i data-lucide="cpu"></i>
+        <span>How it Works</span>
+      </button>
+
+      <button class="nav-tab" onclick="switchTab('specs', 2)">
+        <i data-lucide="sliders"></i>
+        <span>Specs</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    /* ===================================================================
+       1. IMAGE FILE PATH CONFIGURATION
+       Update these filenames if your photo or logo have different names
+    =================================================================== */
+    const PHOTO_SRC = 'hero-bg.jpg'; // Path to photo of man holding sign
+    const LOGO_SRC = 'logo.png';     // Path to logo.png
+
+    // Load Image Objects
+    const heroImage = new Image();
+    heroImage.src = PHOTO_SRC;
+
+    const logoImage = new Image();
+    logoImage.src = LOGO_SRC;
+
+    let imagesLoaded = 0;
+    function checkLoaded() {
+      imagesLoaded++;
+      if (imagesLoaded >= 2) {
+        renderHeroAnimation();
+      }
+    }
+    heroImage.onload = checkLoaded;
+    logoImage.onload = checkLoaded;
+
+    // Fallback draw in case local images take a moment to load
+    heroImage.onerror = () => { console.warn('Hero image not found at', PHOTO_SRC); };
+    logoImage.onerror = () => { console.warn('Logo image not found at', LOGO_SRC); };
+
+    /* ===================================================================
+       2. SCROLL ANIMATION CONTROLLER (Encryption Glitch + Logo Shrink)
+    =================================================================== */
+    const heroContainer = document.getElementById('hero-container');
+    const canvas = document.getElementById('hero-canvas');
+    const ctx = canvas.getContext('2d');
+    const brandTitle = document.getElementById('brand-title');
+    const brandSubtitle = document.getElementById('brand-subtitle');
+    const scrollHint = document.getElementById('scroll-hint');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const blockSize = 20;
+    const matrixChars = "01011001010111001010101100010101".split("");
+
+    function renderHeroAnimation() {
+      const rect = heroContainer.getBoundingClientRect();
+      const maxScroll = heroContainer.offsetHeight - window.innerHeight;
+      const scrollY = Math.max(0, -rect.top);
+      let progress = Math.min(1, Math.max(0, scrollY / maxScroll));
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Phase 1: Photo of man holding sign (Progress: 0.0 -> 0.5)
+      let photoOpacity = 1 - Math.min(1, Math.max(0, (progress - 0.2) / 0.35));
+      
+      if (photoOpacity > 0 && heroImage.complete && heroImage.naturalWidth !== 0) {
+        ctx.save();
+        ctx.globalAlpha = photoOpacity;
+        
+        // Scale cover mode
+        const scale = Math.max(canvas.width / heroImage.width, canvas.height / heroImage.height) * (1 - progress * 0.08);
+        const x = (canvas.width - heroImage.width * scale) / 2;
+        const y = (canvas.height - heroImage.height * scale) / 2;
+        
+        ctx.drawImage(heroImage, x, y, heroImage.width * scale, heroImage.height * scale);
+        ctx.restore();
+      }
+
+      // Phase 2: Matrix / Scramble Encryption Layer (Progress: 0.15 -> 0.75)
+      if (progress > 0.15 && progress < 0.8) {
+        const glitchProgress = (progress - 0.15) / 0.65;
+        ctx.save();
+        ctx.font = '12px "IBM Plex Mono", monospace';
+        
+        const cols = Math.ceil(canvas.width / blockSize);
+        const rows = Math.ceil(canvas.height / blockSize);
+
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            const rand = Math.random();
+            if (rand < glitchProgress * 0.85) {
+              const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+              const alpha = Math.sin(glitchProgress * Math.PI) * Math.random();
+              
+              ctx.fillStyle = rand > 0.5 ? `rgba(0, 242, 254, ${alpha})` : `rgba(242, 240, 235, ${alpha * 0.6})`;
+              ctx.fillText(char, i * blockSize, j * blockSize);
+            }
+          }
+        }
+        ctx.restore();
+      }
+
+      // Phase 3: Logo Fade in & Shrink (Progress: 0.45 -> 1.0)
+      if (progress > 0.45 && logoImage.complete && logoImage.naturalWidth !== 0) {
+        const logoFade = Math.min(1, (progress - 0.45) / 0.25);
+        const shrinkProgress = Math.max(0, (progress - 0.7) / 0.3); // Shrink scale down
+
+        ctx.save();
+        ctx.globalAlpha = logoFade;
+
+        // Dynamic logo sizing (starts at 200px and shrinks to 90px)
+        const startSize = Math.min(canvas.width * 0.4, 220);
+        const endSize = 90;
+        const currentSize = startSize - (shrinkProgress * (startSize - endSize));
+
+        // Center position moves upwards slightly as title appears
+        const centerX = canvas.width / 2;
+        const centerY = (canvas.height / 2) - (shrinkProgress * 65);
+
+        ctx.drawImage(
+          logoImage, 
+          centerX - (currentSize / 2), 
+          centerY - (currentSize / 2), 
+          currentSize, 
+          currentSize
+        );
+
+        ctx.restore();
+      }
+
+      // Phase 4: Title & Subtitle Fade In (Progress: 0.75 -> 1.0)
+      if (progress > 0.75) {
+        const textProgress = (progress - 0.75) / 0.25;
+        brandTitle.style.opacity = textProgress;
+        brandTitle.style.transform = `translateY(${(1 - textProgress) * 20}px) scale(${0.9 + textProgress * 0.1})`;
+        
+        brandSubtitle.style.opacity = textProgress;
+        brandSubtitle.style.transform = `translateY(${(1 - textProgress) * 10}px)`;
+      } else {
+        brandTitle.style.opacity = 0;
+        brandSubtitle.style.opacity = 0;
+      }
+
+      scrollHint.style.opacity = progress > 0.85 ? 0 : 1 - (progress * 1.5);
+    }
+
+    window.addEventListener('scroll', () => {
+      requestAnimationFrame(renderHeroAnimation);
+    });
+    renderHeroAnimation();
+
+    /* ===================================================================
+       3. TAB NAVIGATION SWITCHER
+    =================================================================== */
+    function switchTab(tabId, index) {
+      const tabs = document.querySelectorAll('.nav-tab');
+      tabs.forEach(t => t.classList.remove('active'));
+      tabs[index].classList.add('active');
+
+      const indicator = document.getElementById('nav-indicator');
+      indicator.style.transform = `translateX(${index * 100}%)`;
+
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(c => c.classList.remove('active'));
+      
+      const selectedTab = document.getElementById(`tab-${tabId}`);
+      if (selectedTab) {
+        selectedTab.classList.add('active');
+      }
+
+      if (window.scrollY < window.innerHeight * 1.5) {
+        const targetY = heroContainer.offsetHeight;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+      }
+    }
+  </script>
+</body>
+</html>
