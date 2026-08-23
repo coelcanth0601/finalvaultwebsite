@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Vault — Finally! Privacy</title>
+<meta name="description" content="Final Vault. Your files, private by default. No cloud, no recovery, no one else's key.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===================== SCROLL-DRIVEN INTRO ===================== -->
+<!-- .intro-spacer is a tall block (280vh). .intro sticks to the viewport
+     for the duration of that scroll distance; script.js reads scroll
+     position (never blocks it) to drive:
+       phase A (0–0.45): your photo glitches/dissolves into the logo
+       phase B (0.45–0.8): the logo shrinks, "FinalVault" decrypt-types in
+     After the spacer's height is scrolled past, .intro releases and the
+     rest of the page follows normally. -->
+<div class="intro-spacer" id="intro-spacer">
+  <section class="intro" id="intro">
+
+    <div class="photo-layer" id="photo-layer">
+      <img src="hero.jpg" alt="" id="hero-photo">
+      <div class="glitch-slice slice-1" style="background-image:url('hero.jpg')"></div>
+      <div class="glitch-slice slice-2" style="background-image:url('hero.jpg')"></div>
+      <div class="glitch-slice slice-3" style="background-image:url('hero.jpg')"></div>
+      <div class="scanlines"></div>
+    </div>
+
+    <div class="logo-layer" id="logo-layer">
+      <img src="logo.png" alt="Final Vault logo" id="logo-img">
+    </div>
+
+    <div class="brand-layer" id="brand-layer">
+      <h1 class="brand-name" id="brand-name" aria-label="FinalVault">FinalVault</h1>
+    </div>
+
+    <p class="scroll-hint" id="scroll-hint">keep scrolling</p>
+  </section>
+</div>
+
+<!-- ===================== REST OF PAGE ===================== -->
+<main id="main-content">
+
+  <section class="reveal-block">
+    <p class="lede">
+      Final Vault keeps your files on a drive you hold, opened only by a
+      password only you know. Nothing about it phones home. Nothing about
+      it is recoverable if you lose that password — that part's on
+      purpose.
+    </p>
+  </section>
+
+  <section class="flow reveal-block" id="home">
+    <h2 class="section-title">How it stays yours</h2>
+    <ol class="flow-steps">
+      <li>
+        <span class="flow-num">01</span>
+        <h3>You're the only key</h3>
+        <p>A username and a password, chosen by you, never written down
+          anywhere — not on the drive, not on your phone.</p>
+      </li>
+      <li>
+        <span class="flow-num">02</span>
+        <h3>Locked, properly</h3>
+        <p>Everything is scrambled before it ever touches the drive —
+          your files, and their names too.</p>
+      </li>
+      <li>
+        <span class="flow-num">03</span>
+        <h3>No way back in</h3>
+        <p>Forget your password and it's gone for good. No support desk,
+          no reset link, no exceptions.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="plate-section reveal-block" id="specs">
+    <h2 class="section-title">What you get</h2>
+    <div class="plate">
+      <div class="plate-row"><span>ENCRYPTION</span><span>ON, ALWAYS</span></div>
+      <div class="plate-row"><span>AUTH</span><span>USERNAME + PASSWORD</span></div>
+      <div class="plate-row"><span>FILENAMES</span><span>HIDDEN TOO</span></div>
+      <div class="plate-row"><span>CLOUD BACKUP</span><span>NEVER</span></div>
+      <div class="plate-row"><span>RECOVERY</span><span>NONE</span></div>
+      <div class="plate-row"><span>LOOK</span><span>MATERIAL YOU · DARK</span></div>
+    </div>
+  </section>
+
+  <section class="policy reveal-block" id="policy">
+    <p class="policy-quote">"If you forget the password, the data is gone.<br>
+      That's not a bug we haven't fixed.<br>It's the whole point."</p>
+  </section>
+
+  <section class="reveal-block" id="source-section" style="padding-bottom: 160px; text-align:center;">
+    <a class="source-link" href="https://github.com/" target="_blank" rel="noopener">View source ↗</a>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>FINAL VAULT</span>
+  <span class="credit">Built by Rachit Ranade</span>
+</footer>
+
+<!-- ===================== iOS-STYLE LIQUID GLASS TAB BAR ===================== -->
+<nav class="tab-bar" aria-label="Section navigation">
+  <div class="tab-bar-glass">
+    <a class="tab-item active" href="#home" data-tab="home">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+      <span>Home</span>
+    </a>
+    <a class="tab-item" href="#specs" data-tab="specs">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M4 5h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg>
+      <span>Specs</span>
+    </a>
+    <a class="tab-item" href="#policy" data-tab="policy">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/></svg>
+      <span>Policy</span>
+    </a>
+    <a class="tab-item" href="#source-section" data-tab="source">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M8 5l-6 7 6 7 1.4-1.4L4.8 12l4.6-5.6zm8 0l-1.4 1.4 4.6 5.6-4.6 5.6L16 19l6-7z"/></svg>
+      <span>Source</span>
+    </a>
+  </div>
+</nav>
+
+<script src="script.js"></script>
+</body>
+</html>
