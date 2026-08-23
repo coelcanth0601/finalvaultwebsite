@@ -1,0 +1,362 @@
+:root {
+  --bg: #050505;
+  --bg-raised: #0F0F0F;
+  --ink: #F2F0EB;
+  --ink-dim: #92908A;
+  --line: #2A2A28;
+  --saffron: #FF9933;
+  --green: #138808;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+/* ================= INTRO (sticky, scroll-driven) ================= */
+
+.intro-spacer {
+  height: 280vh;
+  position: relative;
+}
+
+.intro {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+/* ---- Photo layer: fades/glitches out as you scroll ---- */
+
+.photo-layer {
+  position: absolute;
+  inset: 0;
+  /* opacity set inline by JS */
+}
+
+.photo-layer img,
+.glitch-slice {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+}
+
+.photo-layer img { display: block; }
+
+.glitch-slice {
+  opacity: 0; /* JS turns these on only mid-transition, briefly */
+  mix-blend-mode: screen;
+}
+.slice-1 { clip-path: inset(20% 0 65% 0); }
+.slice-2 { clip-path: inset(55% 0 20% 0); }
+.slice-3 { clip-path: inset(80% 0 5% 0); }
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.05) 0px,
+    rgba(255,255,255,0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0; /* JS ramps this up during the transition band */
+  pointer-events: none;
+}
+
+/* ---- Logo layer: fades in as photo fades out, then shrinks ---- */
+
+.logo-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0; /* JS-driven */
+  pointer-events: none;
+}
+
+#logo-img {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  border-radius: 12px;
+  /* transform (scale/translate) set inline by JS */
+}
+
+/* ---- Brand name layer: decrypt-text reveal ---- */
+
+.brand-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 14vh;
+  opacity: 0; /* JS-driven */
+  pointer-events: none;
+}
+
+.brand-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+  font-size: clamp(28px, 7vw, 48px);
+  letter-spacing: 0.02em;
+  margin: 0;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 6vh;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  opacity: 0;
+  animation: bob 2s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint { animation: none; }
+}
+
+/* ================= Reveal-on-scroll sections ================= */
+
+.reveal-block {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal-block.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.lede {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 100px 24px 90px;
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.55;
+  text-align: center;
+  color: var(--ink);
+}
+
+.flow {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 40px 24px 100px;
+}
+
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 26px;
+  margin: 0 0 44px;
+  text-align: center;
+}
+
+.flow-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.flow-steps li {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+
+.flow-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--ink-dim);
+  letter-spacing: 0.1em;
+}
+
+.flow-steps h3 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 19px;
+  margin: 14px 0 10px;
+}
+
+.flow-steps p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+  margin: 0;
+}
+
+.plate-section {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 24px 100px;
+}
+
+.plate {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.plate-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line);
+}
+.plate-row:last-child { border-bottom: none; }
+
+.plate-row span:first-child { color: var(--ink-dim); }
+.plate-row span:last-child { color: var(--ink); text-align: right; }
+
+.plate-row:nth-child(5) span:last-child {
+  background: linear-gradient(90deg, var(--saffron), var(--ink), var(--green));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 500;
+}
+
+.policy {
+  border-top: 1px solid var(--line);
+  padding: 90px 24px;
+  text-align: center;
+}
+
+.policy-quote {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.6;
+  color: var(--ink);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.source-link {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  padding: 12px 22px;
+  border-radius: 999px;
+  display: inline-block;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.source-link:hover { color: var(--ink); border-color: var(--ink-dim); }
+
+.site-footer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  align-items: center;
+  padding: 28px;
+  border-top: 1px solid var(--line);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-dim);
+  flex-wrap: wrap;
+  text-align: center;
+  padding-bottom: 120px; /* clears the floating tab bar */
+}
+
+/* ================= iOS-style liquid glass tab bar ================= */
+
+.tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  pointer-events: none;
+}
+
+.tab-bar-glass {
+  pointer-events: auto;
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 26px;
+  background: rgba(20, 20, 20, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 16px;
+  border-radius: 18px;
+  text-decoration: none;
+  color: var(--ink-dim);
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: color 0.25s ease, background 0.25s ease, transform 0.15s ease;
+}
+
+.tab-item svg { transition: transform 0.2s ease; }
+
+.tab-item:active { transform: scale(0.92); }
+
+.tab-item.active {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 720px) {
+  .flow-steps { grid-template-columns: 1fr; gap: 32px; }
+  .tab-item { padding: 8px 12px; }
+  .tab-item span { display: none; }
+  .tab-bar-glass { gap: 10px; padding: 10px; }
+}
